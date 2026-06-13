@@ -43,6 +43,15 @@ pub fn encoder_totals<I: I2c>(i2c: &mut I) -> Result<[u32; 4], I::Error> {
     Ok([enc1, enc2, enc3, enc4])
 }
 
+pub fn reset_encoder_totals<I: I2c>(i2c: &mut I) -> Result<(), I::Error> {
+    // Write the address we're writing to (encoder totals), followed by 4 32-bit values of 0.
+    // It _may_ be possible to make this API more generic if this device supports writing arbitrary
+    // values, but the documentation only specifies this usecase of writing all 0s. So, for now, we
+    // can't set the totals to whatever we want.
+    const RESET: [u8; 17] = [ENCODER_TOTAL_REG, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    i2c.write(BOARD_I2C_ADDR, &RESET)
+}
+
 pub fn set_motors_type<I: I2c>(i2c: &mut I, ty: MotorType) -> Result<(), I::Error> {
     i2c.write(BOARD_I2C_ADDR, &[MOTOR_TYPE_REG, ty as u8])
 }
