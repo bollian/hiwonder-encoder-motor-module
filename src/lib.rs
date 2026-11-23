@@ -2,6 +2,7 @@ use bytemuck::must_cast_slice;
 use embedded_hal::i2c::{I2c, Operation};
 
 #[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MotorType {
     /// DC motor with no encoder
     NoEncoder = 0,
@@ -14,6 +15,17 @@ pub enum MotorType {
 
     /// 12V DC motor with quadrature encoder
     JGB37 = 3,
+}
+
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub enum EncoderPolarity {
+    /// Positive motor speeds produce the positive direction of the encoder
+    #[default]
+    Forward = 0,
+
+    /// Positive motor speeds produce the negative direction of the encoder
+    Reverse = 1,
 }
 
 const BOARD_I2C_ADDR: u8 = 0x34;
@@ -56,7 +68,7 @@ pub fn set_motors_type<I: I2c>(i2c: &mut I, ty: MotorType) -> Result<(), I::Erro
     i2c.write(BOARD_I2C_ADDR, &[MOTOR_TYPE_REG, ty as u8])
 }
 
-pub fn set_encoder_polarity<I: I2c>(i2c: &mut I, polarity: bool) -> Result<(), I::Error> {
+pub fn set_encoder_polarity<I: I2c>(i2c: &mut I, polarity: EncoderPolarity) -> Result<(), I::Error> {
     i2c.write(BOARD_I2C_ADDR, &[MOTOR_ENCODER_POLARITY_REG, polarity as u8])
 }
 
