@@ -24,7 +24,7 @@ const MOTOR_PWM_REG: u8 = 0x1f;
 const MOTOR_SPEED_REG: u8 = 0x33;
 const ENCODER_TOTAL_REG: u8 = 0x3c;
 
-pub fn power_nanovolts<I: I2c>(i2c: &mut I) -> Result<u16, I::Error> {
+pub fn power_millivolts<I: I2c>(i2c: &mut I) -> Result<u16, I::Error> {
     let mut bytes = [0; 2];
     i2c.write_read(BOARD_I2C_ADDR, &[POWER_ADC_REG], &mut bytes[..])?;
     Ok(u16::from_le_bytes(bytes))
